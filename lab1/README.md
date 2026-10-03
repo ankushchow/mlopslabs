@@ -17,3 +17,8 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m pytest test/test_pytest.py -v
 python -m unittest test.test_unittest -v
+
+```
+
+## Automation
+GitHub Actions runs both test suites on pushes to main and pull requests.
