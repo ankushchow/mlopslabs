@@ -1,0 +1,16 @@
+Limit each tree to depth 5 to compare a moderate depth limit against the baseline and depth 2.
+
+Stage: train_model
+Arguments: ['--experiment', 'depth-5']
+Trained wine-comparison-depth-5 on UCI Wine: train=106, calibration=36, test=36
+Exit code: 0
+
+Stage: calibrate_model
+Arguments: []
+Calibrated wine-comparison-depth-5 using 36 separate rows
+Exit code: 0
+
+Stage: evaluate_model
+Arguments: ['--min-f1', '0.85']
+PASS: calibrated macro F1=0.9752, required >= 0.8500
+Exit code: 0
