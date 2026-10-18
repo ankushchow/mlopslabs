@@ -1,9 +1,11 @@
+import json
+
 import joblib
 import numpy as np
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.frozen import FrozenEstimator
 
-from src.common import parser
+from src.common import parser, write_json
 
 
 def main():
@@ -15,6 +17,9 @@ def main():
         calibrated.fit(data["X_cal"], data["y_cal"])
         calibration_rows = len(data["y_cal"])
     joblib.dump(calibrated, run / "calibrated_model.joblib")
+    experiment = json.loads((run / "experiment.json").read_text())
+    experiment["status"] = "calibrated"
+    write_json(run / "experiment.json", experiment)
     print(f"Calibrated {args.version} using {calibration_rows} separate rows")
 
 

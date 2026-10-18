@@ -50,6 +50,11 @@ def test_pipeline_pass_failure_and_version_collision(tmp_path):
     output = tmp_path / "test-run"
     report = json.loads((output / "metrics.json").read_text())
     assert report["gate"]["passed"]
+    experiment = json.loads((output / "experiment.json").read_text())
+    assert experiment["status"] == "passed"
+    assert experiment["description"]
+    assert experiment["preprocessing"]["scaling"]
+    assert experiment["evaluation"] == report
     assert report["metrics"]["calibrated_model"]["f1"] >= 0.85
     assert (output / "model.joblib").is_file()
     assert (output / "calibrated_model.joblib").is_file()
@@ -71,6 +76,7 @@ def test_pipeline_pass_failure_and_version_collision(tmp_path):
     assert rejected.returncode == 1, rejected.stdout + rejected.stderr
     assert "FAIL" in rejected.stdout
     assert not json.loads((output / "metrics.json").read_text())["gate"]["passed"]
+    assert json.loads((output / "experiment.json").read_text())["status"] == "rejected"
 
 
 def test_wine_data_has_expected_features_and_labels():
@@ -112,3 +118,39 @@ def test_missing_training_outputs_fail_without_metrics(tmp_path, module):
     assert result.returncode != 0
     assert "FileNotFoundError" in result.stderr
     assert not (tmp_path / "missing" / "metrics.json").exists()
+
+
+@pytest.mark.parametrize("threshold", ["0.85", "1.0"])
+def test_three_experiments_are_distinct_and_keep_logs_on_rejection(tmp_path, threshold):
+    result = subprocess.run(
+        [sys.executable, "-m", "src.run_experiments", "--version", "comparison",
+         "--output-dir", str(tmp_path), "--min-f1", threshold],
+        capture_output=True, text=True,
+    )
+    assert result.returncode == (0 if threshold == "0.85" else 1), result.stdout + result.stderr
+    batch = tmp_path / "comparison"
+    summary = json.loads((batch / "experiments.json").read_text())
+    assert len(summary["experiments"]) == 3
+    expected_depths = {"baseline": None, "depth-2": 2, "depth-5": 5}
+    reference = None
+    for record in summary["experiments"]:
+        name = record["experiment"]
+        run = batch / record["version"]
+        model = joblib.load(run / "model.joblib")
+        assert model.max_depth == record["parameters"]["max_depth"] == expected_depths[name]
+        assert record["description"] and record["preprocessing"]["split_seeds"] == [42, 43]
+        assert json.loads((run / "experiment.json").read_text()) == record
+        evaluation = record["evaluation"]
+        assert evaluation["gate"]["minimum"] == float(threshold)
+        assert record["status"] == ("passed" if evaluation["gate"]["passed"] else "rejected")
+        log = (batch / f"{name}.log").read_text()
+        assert record["description"] in log
+        assert all(f"Stage: {stage}" in log for stage in ("train_model", "calibrate_model", "evaluate_model"))
+        with np.load(run / "heldout.npz") as data:
+            current = {key: data[key].copy() for key in data.files}
+        if reference is not None:
+            for key in reference:
+                np.testing.assert_array_equal(reference[key], current[key])
+        reference = current
+    if threshold == "1.0":
+        assert any(record["status"] == "rejected" for record in summary["experiments"])

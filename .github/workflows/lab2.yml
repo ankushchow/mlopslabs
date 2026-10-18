@@ -63,28 +63,30 @@ jobs:
           cache: pip
           cache-dependency-path: lab2/requirements.txt
       - run: python -m pip install -r requirements.txt
-      - name: Train
-        run: python -m src.train_model --version "$VERSION"
-      - name: Calibrate on separate data
-        run: python -m src.calibrate_model --version "$VERSION"
-      - name: Evaluate and enforce quality gate
-        run: python -m src.evaluate_model --version "$VERSION" --min-f1 "$MIN_F1"
-      - name: Preserve metrics even when the quality gate fails
+      - name: Run all three experiments and enforce the quality gate
+        run: python -m src.run_experiments --version "$VERSION" --min-f1 "$MIN_F1"
+      - name: Preserve experiment descriptions, results, and logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lab2-metrics-${{ github.run_id }}-${{ github.run_attempt }}
-          path: lab2/artifacts/*/metrics.json
+          name: lab2-experiments-${{ env.VERSION }}
+          path: |
+            lab2/artifacts/${{ env.VERSION }}/experiments.json
+            lab2/artifacts/${{ env.VERSION }}/*.log
+            lab2/artifacts/${{ env.VERSION }}/**/experiment.json
+            lab2/artifacts/${{ env.VERSION }}/**/metrics.json
           if-no-files-found: warn
           retention-days: 30
-      - name: Publish versioned model after the quality gate passes
+      - name: Publish models after all three experiments pass
         if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: lab2-model-${{ env.VERSION }}
+          name: lab2-models-${{ env.VERSION }}
           path: |
-            lab2/artifacts/${{ env.VERSION }}/*.joblib
-            lab2/artifacts/${{ env.VERSION }}/training.json
-            lab2/artifacts/${{ env.VERSION }}/metrics.json
+            lab2/artifacts/${{ env.VERSION }}/**/*.joblib
+            lab2/artifacts/${{ env.VERSION }}/**/training.json
+            lab2/artifacts/${{ env.VERSION }}/**/experiment.json
+            lab2/artifacts/${{ env.VERSION }}/**/metrics.json
+            lab2/artifacts/${{ env.VERSION }}/experiments.json
           if-no-files-found: error
           retention-days: 30

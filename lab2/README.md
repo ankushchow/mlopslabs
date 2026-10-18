@@ -5,13 +5,14 @@ This submission adapts [Ramin Mohammadi's Lab 2](https://github.com/raminmohamma
 ## Changes from the starter
 
 - **Data:** Replaced synthetic data with UCI Wine: 178 samples, 13 features, and 3 classes. Added reproducible, stratified splits of 106 training, 36 calibration, and 36 test rows.
-- **Model:** Added sigmoid probability calibration using separate calibration data while keeping the Random Forest classifier.
+- **Model:** Compared three Random Forest configurations: unrestricted depth, depth 2, and depth 5. All use 100 trees and sigmoid calibration on separate data.
 - **Evaluation:** Added held-out macro F1 evaluation for both models and a minimum calibrated macro F1 of 0.85. Evaluation fails below this threshold.
 - **Workflow:** Added two dependent jobs: tests followed by training, calibration, and evaluation. The final step publishes the model only after the quality gate passes on `main`.
 - **Workflow triggers:** Added path-filtered push and pull-request checks, plus manual runs with a configurable F1 threshold; removed scheduled execution.
 - **Model versioning:** Replaced bot commits with downloadable model artifacts identified by run ID and attempt. Artifacts are retained for 30 days, and repository permissions are read-only.
 - **Failure reports:** Added JUnit test reports and saved metrics that remain available when checks fail.
-- **Tests:** Added 19 tests covering the dataset, split separation, class representation, model probabilities, macro F1, quality-gate behavior, invalid inputs, and missing files.
+- **Tests:** Added 21 tests covering the data, model outputs, quality gate, and experiment logs, including failed evaluations.
+- **Experiment logs:** Each run records what was tried, preprocessing choices, model settings, results, and pass/fail status. Text logs also capture the output of each stage.
 
 We retain the random forest algorithm and replace the synthetic data with UCI Wine. JSON reports replace the starter's local MLflow logging; there is no tracking server to install. We report macro F1 for both models: the mean of the F1 scores for the three classes, giving each class equal weight. Calibration adjusts predicted probabilities and is not guaranteed to improve F1. The gate checks the calibrated model's macro F1 only.
 
@@ -70,49 +71,57 @@ You need internet access to install tools/dependencies. No GPU, Docker, AWS acco
 
 All commands in the next two sections run from that directory with the environment activated. If Python 3.11.14 is already installed, standard `python -m venv .venv` and `python -m pip install -r lab2/requirements.txt` from the root after activation are an alternative to uv.
 
-## Run locally
+## Run the three experiments locally
 
-Run each command in order; stop and inspect the error if any command fails:
+From `lab2`, with the virtual environment active:
 
 ```sh
 python -m pytest -q --junitxml=test-results.xml
-python -m src.train_model --version wine-demo
-python -m src.calibrate_model --version wine-demo
-python -m src.evaluate_model --version wine-demo --min-f1 0.85
+python -m src.run_experiments --version wine-comparison --min-f1 0.85
 ```
 
-Success means all 19 tests pass, each script exits with code 0, and the final line starts with `PASS: calibrated macro F1=`. The measured calibrated macro F1 is 0.9752. Outputs are under `artifacts/wine-demo/`:
+The runner trains, calibrates, and evaluates these three configurations:
 
-| File | Purpose |
-|---|---|
-| `model.joblib` | Original fitted random forest |
-| `calibrated_model.joblib` | Forest with calibrated probabilities |
-| `heldout.npz` | Calibration/test data for this version; kept locally, excluded from published model bundle |
-| `training.json` | Dataset source, feature/class names, seed, split sizes, model parameters, and environment versions |
-| `metrics.json` | Both models' held-out metrics and gate decision |
+- **baseline:** 100 trees with no depth limit, to establish a reference score.
+- **depth-2:** 100 trees limited to depth 2, to see how a simpler model performs.
+- **depth-5:** 100 trees limited to depth 5, to compare a moderate depth limit.
 
-Use another version, such as `wine-demo-2`, for another training run. Existing version directories are intentionally rejected. GitHub versions use the run ID and attempt, for example `123456789-1`. Generated outputs and environments are ignored by Git.
+Only tree depth changes. Every experiment uses the same 106 training, 36 calibration, and 36 test rows, with the same seeds and calibration method. These configurations were chosen before comparing their results; the test scores are not used to select or tune a model.
+
+There are no missing values to fill, and Random Forest does not need feature scaling. All 13 original features are used. These preprocessing decisions are written into every experiment record.
+
+A successful run prints three `PASS` messages and exits with code 0. Results are saved in `artifacts/wine-comparison/`:
+
+- `experiments.json` contains all three descriptions, settings, preprocessing choices, scores, and outcomes.
+- `baseline.log`, `depth-2.log`, and `depth-5.log` contain the output and exit code from each stage.
+- Each experiment has its own folder, such as `wine-comparison-baseline/`, containing `experiment.json`, `training.json`, `metrics.json`, both saved models, and the held-out data.
+
+The runner keeps going if one experiment fails, so the other experiments still get recorded. It exits with code 1 if any experiment fails. Existing batch names cannot be overwritten; use `wine-comparison-2` for another run. GitHub uses its run ID and attempt as the batch name.
+
+To run just one configuration:
+
+```sh
+python -m src.train_model --version depth2-demo --experiment depth-2
+python -m src.calibrate_model --version depth2-demo
+python -m src.evaluate_model --version depth2-demo --min-f1 0.85
+```
+
+Use a fresh version name for a new experiment. The default training configuration is `baseline`.
 
 ## Demonstrate rejection
 
-To check that the quality gate works, raise the required F1 score to 1.0:
+Run a separate batch requiring perfect F1:
 
 ```sh
-python -m src.evaluate_model --version wine-demo --min-f1 1.0
+python -m src.run_experiments --version wine-rejection --min-f1 1.0
 ```
 
-The model scores below 1.0, so this prints `FAIL`, exits with code 1, and saves `passed: false` in `metrics.json`. This is the expected result. You can check the exit code with `echo $?` on macOS/Linux or `$LASTEXITCODE` in PowerShell.
-
-Run it again with the normal threshold to get a passing result:
-
-```sh
-python -m src.evaluate_model --version wine-demo --min-f1 0.85
-```
+The measured scores are below 1.0, so this batch exits with code 1. All three experiments still run, and their failed evaluations are saved in `artifacts/wine-rejection/`. The earlier successful batch stays unchanged. Check the exit code with `echo $?` on macOS/Linux or `$LASTEXITCODE` in PowerShell.
 
 ## Tests
 
-The 19 tests check the Wine data, train/calibration/test splits, saved model predictions, and F1 calculations.
-They also check invalid inputs, missing files, duplicate versions, and rejection when the model falls below the required score. All 19 passed locally.
+The 21 tests check the data splits, model predictions, F1 calculations, invalid inputs, and missing files.
+They also check that all three configurations use the same data, save their settings and results correctly, and keep their logs when the quality gate fails.
 
 ## Run on GitHub Actions
 
@@ -128,22 +137,30 @@ git push origin main
 
 Open the repository's **Actions** tab and select **Lab 2 - Train, calibrate, and version**. You can also start it using **Run workflow** on `main`, with `min_f1` set to `0.85`. If Actions is disabled in your fork, enable it first.
 
-GitHub installs Python and the dependencies automatically. A successful run shows two green jobs: `test` and `train-evaluate`. The second job trains the model, calibrates it, checks its F1 score, and uploads the model if it passes. Pull requests run the checks but skip the model upload.
+GitHub installs Python and the dependencies automatically. A successful run shows two green jobs: `test` and `train-evaluate`. The second job runs all three experiments and uploads the models only if all three pass the quality gate. Pull requests run the checks but skip the model upload.
 
-Download `lab2-model-VERSION` from the run's **Artifacts** section. It contains the original model, calibrated model, training details, and F1 results. Test reports and metrics are also available separately. These downloads are kept for 30 days.
+Download `lab2-models-VERSION` from the run's **Artifacts** section for the three model pairs and their results. `lab2-experiments-VERSION` contains the experiment descriptions, metrics, and text logs, even if an experiment fails. Test reports are available separately. These downloads are kept for 30 days.
 
-To try the failure case on GitHub, start a manual run with `min_f1` set to `1.0`. The evaluation should fail and the model upload should be skipped, while the metrics remain available.
+To try the failure case on GitHub, start a manual run with `min_f1` set to `1.0`. The experiment job should fail and the model upload should be skipped, while all experiment logs remain available.
 
 ## Results
 
-Tested locally with Python 3.11.14. Both models scored **0.9752 macro F1** on the 36 test rows, above the required **0.85**. Calibration changed the predicted probabilities but did not change F1 for this split. The workflow also passed actionlint.
+All three experiments passed the 0.85 threshold on the same 36 test rows:
 
-Both jobs passed in GitHub Actions using commit `dd0d353`. The model was saved as `lab2-model-39173683615-1`.
+- **baseline:** base macro F1 0.9752; calibrated macro F1 0.9752; passed.
+- **depth-2:** base macro F1 0.9453; calibrated macro F1 0.9752; passed.
+- **depth-5:** base macro F1 0.9752; calibrated macro F1 0.9752; passed.
+
+The depth-2 model scored lower before calibration, but calibration brought its macro F1 up to the other two models. All three calibrated models tied on this split. This is a small test set, so equal scores do not show that the models would perform equally on new data.
+
+The saved [experiment records](experiments/wine-comparison/experiments.json) and [text logs](experiments/wine-comparison/) are included in the repository. New runs write to `artifacts/`, which is ignored by Git; copy logs you want to submit into `experiments/` under a new batch name.
+
+All 21 tests passed locally, and the workflow passed actionlint. The earlier single-experiment workflow passed on GitHub Actions. This three-experiment version has only been tested locally and still needs an Actions run after it is pushed.
 
 ## Common issues
 
 - **`No module named src`:** activate the virtual environment and run the commands from the `lab2` folder.
-- **`FileExistsError`:** use a new version name, such as `wine-demo-2`.
+- **`FileExistsError`:** use a new version name, such as `wine-comparison-2`.
 - **Missing model or data:** run training, calibration, and evaluation in that order, using the same version name.
 - **Workflow not showing:** check that the workflow file is on the default branch and Actions is enabled.
 - **Import errors:** check that the environment uses Python 3.11.14 and the packages in `requirements.txt`.

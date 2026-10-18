@@ -1,4 +1,5 @@
 import argparse
+import json
 import math
 import os
 
@@ -39,6 +40,12 @@ def main():
     report = {"version": args.version, "test_rows": test_rows, "average": "macro", "metrics": metrics,
               "gate": {"metric": "calibrated_model.f1", "minimum": args.min_f1, "passed": passed}}
     write_json(run / "metrics.json", report)
+    experiment = json.loads((run / "experiment.json").read_text())
+    experiment.update({
+        "status": "passed" if passed else "rejected",
+        "evaluation": report,
+    })
+    write_json(run / "experiment.json", experiment)
     status = "PASS" if passed else "FAIL"
     summary = f"{status}: calibrated macro F1={score:.4f}, required >= {args.min_f1:.4f}"
     print(summary)
