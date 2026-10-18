@@ -1,11 +1,10 @@
 import argparse
-import hashlib
 import json
 import re
 from pathlib import Path
 
 import numpy as np
-from sklearn.datasets import make_classification
+from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 
 
@@ -26,16 +25,9 @@ def write_json(path, value):
     path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
 
 
-def sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def dataset():
-    """Generate once, then split row IDs into disjoint 60/20/20 partitions."""
-    X, y = make_classification(
-        n_samples=2000, n_features=6, n_informative=3, n_redundant=0,
-        n_classes=2, random_state=42,
-    )
+    """Load UCI Wine from sklearn; split into disjoint 106/36/36 partitions."""
+    X, y = load_wine(return_X_y=True)
     train, remaining = train_test_split(
         np.arange(len(y)), test_size=0.4, stratify=y, random_state=42,
     )

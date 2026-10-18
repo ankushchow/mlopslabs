@@ -8,3 +8,6 @@ __pycache__/
 # Lab 2 generated outputs
 lab2/artifacts/
 lab2/test-results.xml
+
+# Local IDE configuration
+.idea/

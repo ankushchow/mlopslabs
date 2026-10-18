@@ -4,6 +4,7 @@ import joblib
 import numpy as np
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import load_wine
 
 from src.common import dataset, parser, write_json
 
@@ -23,10 +24,15 @@ def main():
     write_json(run / "training.json", {
         "version": args.version, "python": platform.python_version(),
         "scikit_learn": sklearn.__version__, "seed": 42,
+        "dataset": "UCI Wine",
+        "dataset_source": "https://archive.ics.uci.edu/dataset/109/wine",
+        "feature_names": load_wine().feature_names,
+        "class_names": load_wine().target_names.tolist(),
         "split_sizes": {key: len(value) for key, value in rows.items()},
         "parameters": model.get_params(),
     })
-    print(f"Trained {args.version}: train=1200, calibration=400, test=400")
+    sizes = ", ".join(f"{name}={len(ids)}" for name, ids in rows.items())
+    print(f"Trained {args.version} on UCI Wine: {sizes}")
 
 
 if __name__ == "__main__":
