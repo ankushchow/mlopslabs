@@ -4,3 +4,7 @@ __pycache__/
 .pytest_cache/
 *-report.xml
 .DS_Store
+
+# Lab 2 generated outputs
+lab2/artifacts/
+lab2/test-results.xml
