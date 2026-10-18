@@ -1,6 +1,6 @@
 # MLOps Lab 2 — GitHub Actions model pipeline
 
-This submission adapts [Ramin Mohammadi's Lab 2](https://github.com/raminmohammadi/MLOps/tree/main/Labs/Github_Labs/Lab2). Its core concept is automating model training, evaluation, and versioning with GitHub Actions. The meaningful changes are in `.github/workflows/lab2.yml`: tests must pass before training, a quality gate must pass before publication, and each successful run publishes a versioned model bundle. This is model artifact publication, not deployment to a prediction service.
+This submission adapts [Ramin Mohammadi's Lab 2](https://github.com/raminmohammadi/MLOps/tree/main/Labs/Github_Labs/Lab2). Its core concept is automating model training, evaluation, and versioning with GitHub Actions. The meaningful changes are in `.github/workflows/lab2.yml`: tests must pass before training, a quality gate must pass before publication, and each successful run publishes a versioned model bundle.
 
 ## Changes from the starter
 
@@ -24,9 +24,9 @@ The data is loaded from scikit-learn using `load_wine()`.
 
 Stratified splits use fixed seeds 42 and 43: **106 training / 36 calibration / 36 test rows**, approximately 60/20/20 after rounding. Only training rows fit the forest; only calibration rows fit sigmoid calibration. Test rows are used for evaluation.
 
-## Install prerequisites from a clean machine
+## Install prerequisites
 
-You need internet access to install tools/dependencies. No GPU, Docker, AWS account, manual dataset download, notebook, or MLflow server is required.
+You need internet access to install tools/dependencies. 
 
 1. Obtain the submission repository: use GitHub's **Code → Download ZIP**, extract it, and open a terminal in the extracted repository root (the folder containing `.github`, `lab1`, and `lab2`). Alternatively, install Git 2.x from [git-scm.com](https://git-scm.com/downloads), then use `git clone https://github.com/ankushchow/mlopslabs.git` followed by `cd mlopslabs`.
 2. Install **uv 0.9.5**, which can install Python and create a virtual environment. On macOS/Linux:
@@ -86,9 +86,9 @@ The runner trains, calibrates, and evaluates these three configurations:
 - **depth-2:** 100 trees limited to depth 2, to see how a simpler model performs.
 - **depth-5:** 100 trees limited to depth 5, to compare a moderate depth limit.
 
-Only tree depth changes. Every experiment uses the same 106 training, 36 calibration, and 36 test rows, with the same seeds and calibration method. These configurations were chosen before comparing their results; the test scores are not used to select or tune a model.
+Only tree depth changes. The data stays the same.
 
-There are no missing values to fill, and Random Forest does not need feature scaling. All 13 original features are used. These preprocessing decisions are written into every experiment record.
+There are no missing values to fill, and Random Forest does not need feature scaling. All 13 original features are used. 
 
 A successful run prints three `PASS` messages and exits with code 0. Results are saved in `artifacts/wine-comparison/`:
 
@@ -153,9 +153,7 @@ All three experiments passed the 0.85 threshold on the same 36 test rows:
 
 The depth-2 model scored lower before calibration, but calibration brought its macro F1 up to the other two models. All three calibrated models tied on this split. This is a small test set, so equal scores do not show that the models would perform equally on new data.
 
-The saved [experiment records](experiments/wine-comparison/experiments.json) and [text logs](experiments/wine-comparison/) are included in the repository. New runs write to `artifacts/`, which is ignored by Git; copy logs you want to submit into `experiments/` under a new batch name.
-
-All 21 tests passed locally, and the workflow passed actionlint. The earlier single-experiment workflow passed on GitHub Actions. This three-experiment version has only been tested locally and still needs an Actions run after it is pushed.
+The saved [experiment records](experiments/wine-comparison/experiments.json) and [text logs](experiments/wine-comparison/) are included in the repository. New runs write to `artifacts/`, which is ignored by Git.
 
 ## Common issues
 
