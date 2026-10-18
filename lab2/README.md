@@ -12,18 +12,16 @@ This submission adapts [Ramin Mohammadi's Lab 2](https://github.com/raminmohamma
 - **Model versioning:** Replaced bot commits with downloadable model artifacts identified by run ID and attempt. Artifacts are retained for 30 days, and repository permissions are read-only.
 - **Failure reports:** Added JUnit test reports and saved metrics that remain available when checks fail.
 - **Tests:** Added 19 tests covering the dataset, split separation, class representation, model probabilities, macro F1, quality-gate behavior, invalid inputs, and missing files.
-- **Environment:** Pinned Python to 3.11.14 and fixed dependency versions for reproducible runs.
-- **Documentation:** Added installation instructions, PyCharm setup, exact run commands, expected outputs, dataset attribution, and validation results.
 
-We retain the random forest algorithm and replace the synthetic data with UCI Wine. JSON reports replace the starter's local MLflow logging; there is no tracking server to install. We report macro F1 for both models: the mean of the F1 scores for the three classes, giving each class equal weight. Calibration adjusts predicted probabilities and is not guaranteed to improve F1. The gate checks the calibrated model's macro F1 only; 0.85 is this submission's chosen threshold, not an instructor-specified value.
+We retain the random forest algorithm and replace the synthetic data with UCI Wine. JSON reports replace the starter's local MLflow logging; there is no tracking server to install. We report macro F1 for both models: the mean of the F1 scores for the three classes, giving each class equal weight. Calibration adjusts predicted probabilities and is not guaranteed to improve F1. The gate checks the calibrated model's macro F1 only.
 
 ## Dataset: UCI Wine
 
-Source: [UCI Wine](https://archive.ics.uci.edu/dataset/109/wine), Aeberhard, S. & Forina, M. (1992), [DOI: 10.24432/C5PC7J](https://doi.org/10.24432/C5PC7J), licensed CC BY 4.0. The dataset contains 178 wines from three cultivars, with 13 chemical measurements such as alcohol, malic acid, color intensity, and proline. We predict the cultivar class, not a quality rating.
+Source: [UCI Wine](https://archive.ics.uci.edu/dataset/109/wine). The dataset contains 178 wines from three cultivars, with 13 chemical measurements such as alcohol, malic acid, color intensity, and proline. We predict the cultivar class, not a quality rating.
 
-The code uses [scikit-learn's bundled copy](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_wine.html) through `load_wine()`. No data download is needed after installing the pinned dependencies. Class labels are encoded as 0, 1, and 2; features are kept in their original order and scale. Random forests do not require feature scaling here.
+The data is loaded from scikit-learn using `load_wine()`.
 
-Stratified splits use fixed seeds 42 and 43: **106 training / 36 calibration / 36 test rows**, approximately 60/20/20 after rounding. Only training rows fit the forest; only calibration rows fit sigmoid calibration. Test rows are used for evaluation. The small test set makes this an instructional example with limited evidence of generalization.
+Stratified splits use fixed seeds 42 and 43: **106 training / 36 calibration / 36 test rows**, approximately 60/20/20 after rounding. Only training rows fit the forest; only calibration rows fit sigmoid calibration. Test rows are used for evaluation.
 
 ## Install prerequisites from a clean machine
 
@@ -72,10 +70,6 @@ You need internet access to install tools/dependencies. No GPU, Docker, AWS acco
 
 All commands in the next two sections run from that directory with the environment activated. If Python 3.11.14 is already installed, standard `python -m venv .venv` and `python -m pip install -r lab2/requirements.txt` from the root after activation are an alternative to uv.
 
-## Use PyCharm
-
-Open the `mlopslabs` repository folder as the project. In **Settings → Project → Python Interpreter**, select the existing interpreter at `.venv/bin/python` (macOS/Linux) or `.venv\Scripts\python.exe` (Windows) after following the setup steps above. Set the terminal working directory to the repository root, activate the virtual environment, then enter `lab2` before running the commands below. If using a Python run configuration, select a **module name** such as `src.train_model`, set its working directory to `lab2`, and supply `--version wine-demo`. Run training, calibration, and evaluation in order using the same version.
-
 ## Run locally
 
 Run each command in order; stop and inspect the error if any command fails:
@@ -101,79 +95,55 @@ Use another version, such as `wine-demo-2`, for another training run. Existing v
 
 ## Demonstrate rejection
 
-After the successful run, execute:
+To check that the quality gate works, raise the required F1 score to 1.0:
 
 ```sh
 python -m src.evaluate_model --version wine-demo --min-f1 1.0
 ```
 
-This deliberately requires perfect F1. Expected result: `FAIL`, exit code **1**, `metrics.json` records `passed: false`. Inspect the exit code immediately with `echo $?` (macOS/Linux) or `$LASTEXITCODE` (PowerShell). This failure is expected and proves the gate is effective.
+The model scores below 1.0, so this prints `FAIL`, exits with code 1, and saves `passed: false` in `metrics.json`. This is the expected result. You can check the exit code with `echo $?` on macOS/Linux or `$LASTEXITCODE` in PowerShell.
 
-Restore the normal successful result:
+Run it again with the normal threshold to get a passing result:
 
 ```sh
 python -m src.evaluate_model --version wine-demo --min-f1 0.85
 ```
 
-The 19 tests cover:
+## Tests
 
-- Dataset dimensions, finite feature values, expected class labels, and class counts.
-- Reproducible, disjoint splits with all three classes and similar class proportions in each split.
-- Quality-gate boundaries, invalid scores, and invalid CLI thresholds (`nan`, `inf`, negative, and above 1).
-- Version path validation and refusal to overwrite an existing training version.
-- A complete pipeline, saved models' three-class probability outputs, and independently recalculated macro F1.
-- Missing training outputs and an actual evaluation failure when the threshold is 1.0.
+The 19 tests check the Wine data, train/calibration/test splits, saved model predictions, and F1 calculations.
+They also check invalid inputs, missing files, duplicate versions, and rejection when the model falls below the required score. All 19 passed locally.
 
 ## Run on GitHub Actions
 
-This submission lives at [ankushchow/mlopslabs](https://github.com/ankushchow/mlopslabs). Lab 2 code is in `lab2/`; its active workflow is `.github/workflows/lab2.yml` at the repository root. You need a GitHub account and write access to push changes or manually trigger runs. A reviewer can inspect the public runs without installing anything.
+The workflow is in `.github/workflows/lab2.yml`. It runs when changes to Lab 2 or the workflow are pushed to `main`, and on pull requests that change those files.
 
-1. Commit and push these source files to `main` in your repository. From the repository root after editing Lab 2:
+From the repository root, commit and push your changes:
 
-   ```sh
-   git add .gitignore .github/workflows/lab2.yml lab2
-   git commit -m "Add gated Lab 2 training and versioning pipeline"
-   git push origin main
-   ```
+```sh
+git add .gitignore .github/workflows/lab2.yml lab2
+git commit -m "Update Lab 2 model pipeline"
+git push origin main
+```
 
-   If Git requests your identity, configure your own name/email. Authenticate to GitHub using your chosen Git credential manager or SSH setup; no credentials belong in source files. If your fork already has other active workflows, inspect those separately; this submission's workflow has a distinct name.
-2. Open **Actions**. If GitHub says workflows are disabled in the fork, enable them. Choose **Lab 2 - Train, calibrate, and version**.
-3. Open the run triggered by your source push, or choose **Run workflow**, select `main`, keep `min_f1` at `0.85`, and run it manually. Manual dispatch requires the workflow to exist on the default branch. PR runs execute tests and evaluation, but the final model-upload step is skipped.
-4. A successful main-branch run has two green jobs: `test` and `train-evaluate`, including a successful final model-upload step. Open the run summary to see the quality decision and metric table.
-5. Download the `lab2-model-VERSION` artifact from the run's **Artifacts** section. It contains both models, training metadata, and F1 metrics. Test reports and metrics are also available as separate diagnostic artifacts. Artifacts expire after **30 days**; download and retain submission evidence before then. A new run creates a separate version; it does not overwrite or deploy an existing model.
-6. Optional failure demonstration: manually run with `min_f1` set to `1.0`. The training/evaluation job must fail and the model-upload step must be skipped. Metrics remain downloadable; that failed run must have no `lab2-model-...` artifact. Then run again with `0.85` so you have a successful final run to submit.
+Open the repository's **Actions** tab and select **Lab 2 - Train, calibrate, and version**. You can also start it using **Run workflow** on `main`, with `min_f1` set to `0.85`. If Actions is disabled in your fork, enable it first.
 
-The workflow installs Python and packages itself on GitHub-hosted Ubuntu runners. It needs no custom secrets and uses `contents: read`. Caching speeds dependency installation; concurrency cancels older runs on the same ref. Timeouts stop stuck jobs. The last step uploads the model bundle only when all preceding steps succeed and the run is on `main` rather than a pull request.
+GitHub installs Python and the dependencies automatically. A successful run shows two green jobs: `test` and `train-evaluate`. The second job trains the model, calibrates it, checks its F1 score, and uploads the model if it passes. Pull requests run the checks but skip the model upload.
 
-## Submission and troubleshooting
+Download `lab2-model-VERSION` from the run's **Artifacts** section. It contains the original model, calibrated model, training details, and F1 results. Test reports and metrics are also available separately. These downloads are kept for 30 days.
 
-Submit your repository URL and the URL of a successful GitHub Actions run. Include the README, source, tests, pinned requirements, and root workflow in Git. See the validation section below for the current status. Local tests alone do not prove GitHub Actions completed.
+To try the failure case on GitHub, start a manual run with `min_f1` set to `1.0`. The evaluation should fail and the model upload should be skipped, while the metrics remain available.
 
-- **`No module named src`**: run from `lab2` using `python -m src...` with the virtual environment active.
-- **`FileExistsError`**: pick a new version for training; this prevents accidental overwrites.
-- **Missing model/data file**: use the same version in train, calibrate, and evaluate, in that order.
-- **Workflow not visible**: confirm `.github/workflows/lab2.yml` exists on the remote default branch and Actions is enabled. Changes under `lab2/` or to this workflow trigger a run; a root-README-only push does not. Use manual dispatch if needed.
-- **Quality failure**: inspect the downloadable metrics and threshold. Do not use `continue-on-error` to bypass the gate.
-- **Dependency/import errors**: recreate the environment using Python 3.11.14 and the pinned requirements. `FrozenEstimator` needs the supplied sklearn version.
+## Results
 
-## Validation
+Tested locally with Python 3.11.14. Both models scored **0.9752 macro F1** on the 36 test rows, above the required **0.85**. Calibration changed the predicted probabilities but did not change F1 for this split. The workflow also passed actionlint.
 
-Local validation completed on October 18, 2026, using Python 3.11.14:
+Both jobs passed in GitHub Actions using commit `dd0d353`. The model was saved as `lab2-model-39173683615-1`.
 
-| Check | Result |
-|---|---|
-| Automated tests | 19 passed, including the complete pipeline and rejection at macro F1 threshold 1.0 |
-| Separate training/calibration/evaluation run | Passed on 36 test rows; base and calibrated macro F1 both 0.9752 |
-| GitHub workflow syntax | actionlint 1.7.7 passed |
+## Common issues
 
-The quality gate still requires calibrated macro F1 ≥ 0.85. The report contains macro F1 and the gate decision. Calibration changed probabilities but did not change F1 on this test split.
-
-The [earlier GitHub Actions run](https://github.com/ankushchow/mlopslabs/actions/runs/39170436589) passed for the previous three-job version. The current two-job workflow with Wine data and 19 tests has not been pushed or run on GitHub. After pushing it yourself, record the new successful run URL here for submission.
-
-## Source references
-
-- [Original Lab 2 instructions and starter](https://github.com/raminmohammadi/MLOps/tree/main/Labs/Github_Labs/Lab2)
-- [GitHub artifact upload action](https://github.com/actions/upload-artifact)
-- [Scikit-learn probability calibration](https://scikit-learn.org/stable/modules/calibration.html)
-
-The upstream repository's root license is CC0 1.0; its Lab 2 README refers to MIT, so consult the actual upstream root license for upstream material. This submission retains the lab concept and a matching lab folder structure while replacing the training/evaluation implementation and workflow with the behavior described above.
+- **`No module named src`:** activate the virtual environment and run the commands from the `lab2` folder.
+- **`FileExistsError`:** use a new version name, such as `wine-demo-2`.
+- **Missing model or data:** run training, calibration, and evaluation in that order, using the same version name.
+- **Workflow not showing:** check that the workflow file is on the default branch and Actions is enabled.
+- **Import errors:** check that the environment uses Python 3.11.14 and the packages in `requirements.txt`.
