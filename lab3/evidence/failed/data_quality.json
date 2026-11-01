@@ -1,0 +1,16 @@
+{
+  "run_id": "manual__2026-11-01T21:12:43.856014+00:00",
+  "source_sha256": "11daf39088d5408eaae921f9519221ed3b0c6f706d6916c051cd424ae0a5ab18",
+  "features": [
+    "bill_length_mm",
+    "bill_depth_mm",
+    "flipper_length_mm",
+    "body_mass_g"
+  ],
+  "input_rows": 310,
+  "invalid_rows": 2,
+  "duplicate_rows": 0,
+  "clean_rows": 308,
+  "invalid_fraction": 0.0064516129032258064,
+  "passed": true
+}

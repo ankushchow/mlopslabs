@@ -1,0 +1,46 @@
+name: Lab 3 - Validate Airflow clustering DAG
+
+on:
+  push:
+    branches: [main]
+    paths: ['lab3/**', '.github/workflows/lab3.yml']
+  pull_request:
+    paths: ['lab3/**', '.github/workflows/lab3.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: lab3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare local directories
+        run: |
+          mkdir -p logs working_data
+          printf 'AIRFLOW_UID=%s\n' "$(id -u)" > .env
+      - name: Build compatible Airflow image
+        run: docker compose build airflow-init
+      - name: Initialize metadata database
+        run: docker compose up airflow-init --exit-code-from airflow-init
+      - name: Test pipeline and DAG structure
+        run: docker compose run --rm airflow-scheduler python -m pytest -q /opt/airflow/tests -p no:cacheprovider
+      - name: Verify successful and rejected DAG execution
+        run: docker compose run --rm airflow-scheduler python /opt/airflow/scripts/verify_dag.py
+      - name: Retain validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab3-airflow-validation
+          path: |
+            lab3/working_data/**/*.json
+            lab3/working_data/**/predictions.csv
+          retention-days: 30
+      - name: Stop containers
+        if: always()
+        run: docker compose down

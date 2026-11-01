@@ -1,0 +1,16 @@
+{
+  "passed": false,
+  "min_silhouette": 1.0,
+  "selected": {
+    "k": 2,
+    "silhouette": 0.5477115849434546,
+    "training_bic": 2218.5975511001234,
+    "validation_log_likelihood": -4.4093332568324435,
+    "converged": true,
+    "cluster_sizes": [
+      161,
+      85
+    ],
+    "min_cluster_fraction": 0.34552845528455284
+  }
+}

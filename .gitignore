@@ -11,3 +11,10 @@ lab2/test-results.xml
 
 # Local IDE configuration
 .idea/
+
+# Lab 3 Airflow local state and generated outputs
+lab3/.env
+lab3/.venv/
+lab3/working_data/
+lab3/logs/
+lab3/test-results.xml

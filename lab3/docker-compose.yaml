@@ -1,0 +1,68 @@
+name: mlops-airflow-lab1
+x-airflow: &airflow
+  build: .
+  image: mlops-airflow-lab1:local
+  user: "${AIRFLOW_UID:-50000}:0"
+  environment: &environment
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'false'
+    AIRFLOW__CORE__PARALLELISM: '4'
+    AIRFLOW__WEBSERVER__SECRET_KEY: local-lab-only-secret
+    AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+    PYTHONPATH: /opt/airflow/dags
+    OMP_NUM_THREADS: '1'
+    OPENBLAS_NUM_THREADS: '1'
+  volumes:
+    - ./dags:/opt/airflow/dags:ro
+    - ./data:/opt/airflow/data:ro
+    - ./tests:/opt/airflow/tests:ro
+    - ./scripts:/opt/airflow/scripts:ro
+    - ./working_data:/opt/airflow/working_data
+    - ./logs:/opt/airflow/logs
+  depends_on:
+    postgres:
+      condition: service_healthy
+services:
+  postgres:
+    image: postgres:16.6
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD, pg_isready, -U, airflow]
+      interval: 5s
+      retries: 10
+  airflow-init:
+    <<: *airflow
+    environment:
+      <<: *environment
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: airflow
+      _AIRFLOW_WWW_USER_PASSWORD: airflow
+    command: version
+  airflow-webserver:
+    <<: *airflow
+    command: webserver
+    ports:
+      - '127.0.0.1:8080:8080'
+    healthcheck:
+      test: [CMD, curl, --fail, http://localhost:8080/health]
+      interval: 10s
+      retries: 12
+      start_period: 30s
+  airflow-scheduler:
+    <<: *airflow
+    command: scheduler
+    healthcheck:
+      test: [CMD-SHELL, 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 15s
+      retries: 10
+      start_period: 30s
+volumes:
+  postgres-data:

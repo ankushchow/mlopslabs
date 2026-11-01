@@ -1,0 +1,196 @@
+[
+  {
+    "run_id": "penguins-success",
+    "state": "success",
+    "tasks": [
+      {
+        "task_id": "validate_data",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:56.307120+00:00",
+        "end_date": "2026-10-19 02:36:56.392485+00:00"
+      },
+      {
+        "task_id": "preprocess",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:57.074640+00:00",
+        "end_date": "2026-10-19 02:36:57.158993+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 3,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:58.247908+00:00",
+        "end_date": "2026-10-19 02:36:58.360184+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 1,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:58.218098+00:00",
+        "end_date": "2026-10-19 02:36:58.339258+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 0,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:58.221133+00:00",
+        "end_date": "2026-10-19 02:36:58.335760+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 2,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:58.233945+00:00",
+        "end_date": "2026-10-19 02:36:58.349794+00:00"
+      },
+      {
+        "task_id": "select_model",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:37:01.408489+00:00",
+        "end_date": "2026-10-19 02:37:01.493698+00:00"
+      },
+      {
+        "task_id": "quality_gate",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:37:02.002062+00:00",
+        "end_date": "2026-10-19 02:37:02.076074+00:00"
+      },
+      {
+        "task_id": "publish_model",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:37:03.141666+00:00",
+        "end_date": "2026-10-19 02:37:03.212933+00:00"
+      },
+      {
+        "task_id": "predict",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:37:04.293922+00:00",
+        "end_date": "2026-10-19 02:37:04.385455+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 5,
+        "state": "success",
+        "start_date": "2026-10-19 02:37:00.386920+00:00",
+        "end_date": "2026-10-19 02:37:00.499738+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 6,
+        "state": "success",
+        "start_date": "2026-10-19 02:37:00.377817+00:00",
+        "end_date": "2026-10-19 02:37:00.499951+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 4,
+        "state": "success",
+        "start_date": "2026-10-19 02:37:00.387194+00:00",
+        "end_date": "2026-10-19 02:37:00.503116+00:00"
+      }
+    ]
+  },
+  {
+    "run_id": "penguins-rejection",
+    "state": "failed",
+    "tasks": [
+      {
+        "task_id": "validate_data",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:47.063571+00:00",
+        "end_date": "2026-10-19 02:36:47.152355+00:00"
+      },
+      {
+        "task_id": "preprocess",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:48.422257+00:00",
+        "end_date": "2026-10-19 02:36:48.517773+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 0,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:49.350825+00:00",
+        "end_date": "2026-10-19 02:36:49.477075+00:00"
+      },
+      {
+        "task_id": "select_model",
+        "map_index": -1,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:52.053910+00:00",
+        "end_date": "2026-10-19 02:36:52.134343+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 1,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:49.331659+00:00",
+        "end_date": "2026-10-19 02:36:49.476454+00:00"
+      },
+      {
+        "task_id": "publish_model",
+        "map_index": -1,
+        "state": "upstream_failed",
+        "start_date": "2026-10-19 02:36:53.335631+00:00",
+        "end_date": "2026-10-19 02:36:53.335631+00:00"
+      },
+      {
+        "task_id": "quality_gate",
+        "map_index": -1,
+        "state": "failed",
+        "start_date": "2026-10-19 02:36:53.220732+00:00",
+        "end_date": "2026-10-19 02:36:53.299405+00:00"
+      },
+      {
+        "task_id": "predict",
+        "map_index": -1,
+        "state": "upstream_failed",
+        "start_date": "2026-10-19 02:36:53.807285+00:00",
+        "end_date": "2026-10-19 02:36:53.807285+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 2,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:49.333512+00:00",
+        "end_date": "2026-10-19 02:36:49.478246+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 3,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:49.364697+00:00",
+        "end_date": "2026-10-19 02:36:49.496875+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 4,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:51.465970+00:00",
+        "end_date": "2026-10-19 02:36:51.588161+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 6,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:51.476104+00:00",
+        "end_date": "2026-10-19 02:36:51.594614+00:00"
+      },
+      {
+        "task_id": "train_candidate",
+        "map_index": 5,
+        "state": "success",
+        "start_date": "2026-10-19 02:36:51.476485+00:00",
+        "end_date": "2026-10-19 02:36:51.595320+00:00"
+      }
+    ]
+  }
+]

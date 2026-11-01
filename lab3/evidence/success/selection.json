@@ -1,0 +1,123 @@
+{
+  "candidates": [
+    {
+      "k": 2,
+      "silhouette": 0.5477115849434546,
+      "training_bic": 2218.5975511001234,
+      "validation_log_likelihood": -4.4093332568324435,
+      "converged": true,
+      "cluster_sizes": [
+        161,
+        85
+      ],
+      "min_cluster_fraction": 0.34552845528455284
+    },
+    {
+      "k": 3,
+      "silhouette": 0.44896842120253844,
+      "training_bic": 2110.055249728725,
+      "validation_log_likelihood": -4.00057270745811,
+      "converged": true,
+      "cluster_sizes": [
+        47,
+        161,
+        38
+      ],
+      "min_cluster_fraction": 0.15447154471544716
+    },
+    {
+      "k": 4,
+      "silhouette": 0.3480787425550435,
+      "training_bic": 2012.209978971541,
+      "validation_log_likelihood": -3.7912374066154446,
+      "converged": true,
+      "cluster_sizes": [
+        69,
+        38,
+        92,
+        47
+      ],
+      "min_cluster_fraction": 0.15447154471544716
+    },
+    {
+      "k": 5,
+      "silhouette": 0.37975497870308367,
+      "training_bic": 2020.0453056045747,
+      "validation_log_likelihood": -3.7510261475729476,
+      "converged": true,
+      "cluster_sizes": [
+        38,
+        43,
+        47,
+        53,
+        65
+      ],
+      "min_cluster_fraction": 0.15447154471544716
+    },
+    {
+      "k": 6,
+      "silhouette": 0.3208376125341628,
+      "training_bic": 2006.4100384360354,
+      "validation_log_likelihood": -3.8315053918460773,
+      "converged": true,
+      "cluster_sizes": [
+        49,
+        38,
+        19,
+        47,
+        28,
+        65
+      ],
+      "min_cluster_fraction": 0.07723577235772358
+    },
+    {
+      "k": 7,
+      "silhouette": 0.25371944654591105,
+      "training_bic": 1988.6639370407702,
+      "validation_log_likelihood": -3.8100868980613636,
+      "converged": true,
+      "cluster_sizes": [
+        19,
+        34,
+        19,
+        65,
+        49,
+        28,
+        32
+      ],
+      "min_cluster_fraction": 0.07723577235772358
+    },
+    {
+      "k": 8,
+      "silhouette": 0.18693957257576307,
+      "training_bic": 2003.144769434206,
+      "validation_log_likelihood": -3.8904016074099723,
+      "converged": true,
+      "cluster_sizes": [
+        39,
+        32,
+        20,
+        22,
+        52,
+        28,
+        34,
+        19
+      ],
+      "min_cluster_fraction": 0.07723577235772358
+    }
+  ],
+  "selected": {
+    "k": 2,
+    "silhouette": 0.5477115849434546,
+    "training_bic": 2218.5975511001234,
+    "validation_log_likelihood": -4.4093332568324435,
+    "converged": true,
+    "cluster_sizes": [
+      161,
+      85
+    ],
+    "min_cluster_fraction": 0.34552845528455284
+  },
+  "selection_metric": "validation silhouette; ties prefer smaller k",
+  "min_cluster_fraction": 0.01
+}

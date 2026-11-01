@@ -1,0 +1,40 @@
+{
+  "approved": true,
+  "run_id": "manual__2026-11-01T21:12:43.440089+00:00",
+  "selected_k": 2,
+  "source_sha256": "11daf39088d5408eaae921f9519221ed3b0c6f706d6916c051cd424ae0a5ab18",
+  "features": [
+    "bill_length_mm",
+    "bill_depth_mm",
+    "flipper_length_mm",
+    "body_mass_g"
+  ],
+  "seed": 42,
+  "quality_gate": {
+    "passed": true,
+    "min_silhouette": 0.35,
+    "selected": {
+      "k": 2,
+      "silhouette": 0.5477115849434546,
+      "training_bic": 2218.5975511001234,
+      "validation_log_likelihood": -4.4093332568324435,
+      "converged": true,
+      "cluster_sizes": [
+        161,
+        85
+      ],
+      "min_cluster_fraction": 0.34552845528455284
+    }
+  },
+  "dataset": "Palmer Penguins",
+  "model_type": "GaussianMixture",
+  "covariance_type": "diag",
+  "scaler": "StandardScaler",
+  "sha256": {
+    "model.joblib": "3f016eaf105da5e85ec5ae80c2be4fa4304e7293f9e468beb94bd707f3e84d84",
+    "selection.json": "68603296996c97b4e25c1ef1d80e92ccf42dbd0f2034c1270084cb85b4f97aa1",
+    "data_quality.json": "8ae5ba3d3d8955aeafa9ad98056797e22fc7a8dba2253ede6eae198b9187aeb2",
+    "split.json": "d78a5d7f0966c5e39c04a168e267b2cdb6ecb1c0ca6ab95e1ca521f80720d0f8",
+    "quality_gate.json": "07ae7c4a5bdac026e1aa9633449219f2f6b5d47d8f08cf6ed5d9829a69a22d3d"
+  }
+}

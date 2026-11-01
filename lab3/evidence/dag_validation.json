@@ -1,0 +1,44 @@
+[
+  {
+    "run_id": "manual__2026-11-01T21:12:43.440089+00:00",
+    "threshold": 0.35,
+    "state": "success",
+    "tasks": {
+      "preprocess[-1]": "success",
+      "quality_gate[-1]": "success",
+      "publish_model[-1]": "success",
+      "validate_data[-1]": "success",
+      "train_candidate[6]": "success",
+      "train_candidate[5]": "success",
+      "train_candidate[2]": "success",
+      "train_candidate[1]": "success",
+      "select_model[-1]": "success",
+      "train_candidate[4]": "success",
+      "train_candidate[0]": "success",
+      "predict[-1]": "success",
+      "train_candidate[3]": "success"
+    },
+    "artifact_directory": "/opt/airflow/working_data/penguins_gmm/989eb7231a233158e970"
+  },
+  {
+    "run_id": "manual__2026-11-01T21:12:43.856014+00:00",
+    "threshold": 1.0,
+    "state": "failed",
+    "tasks": {
+      "validate_data[-1]": "success",
+      "preprocess[-1]": "success",
+      "train_candidate[2]": "success",
+      "train_candidate[1]": "success",
+      "train_candidate[3]": "success",
+      "train_candidate[0]": "success",
+      "select_model[-1]": "success",
+      "quality_gate[-1]": "failed",
+      "train_candidate[5]": "success",
+      "train_candidate[4]": "success",
+      "train_candidate[6]": "success",
+      "publish_model[-1]": "upstream_failed",
+      "predict[-1]": "upstream_failed"
+    },
+    "artifact_directory": "/opt/airflow/working_data/penguins_gmm/8e1cb29fb78cb722d331"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "seed": 42,
+  "train_rows": 246,
+  "validation_rows": 62,
+  "scaler_fit": "training rows only"
+}
