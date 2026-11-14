@@ -1,0 +1,11 @@
+mlflow==3.5.1
+# MLflow 3.5 uses a connection-pool class removed in SQLAlchemy 2.1.
+SQLAlchemy==2.0.44
+# Keep the local serving API compatible with this MLflow release.
+fastapi==0.119.1
+uvicorn==0.38.0
+scikit-learn==1.7.2
+numpy==2.2.6
+pandas==2.3.3
+matplotlib==3.10.7
+pytest==8.4.2

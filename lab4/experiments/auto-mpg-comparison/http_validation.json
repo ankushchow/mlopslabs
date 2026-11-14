@@ -1,0 +1,17 @@
+{
+  "http_status": 200,
+  "predictions": [
+    25.886412736628152,
+    22.630932277784733,
+    34.32435537758724,
+    29.04916098106764,
+    28.204638737988148
+  ],
+  "matches_csv_prediction": true,
+  "missing_features_http_status": 400,
+  "tracking_ui_http_status": 200,
+  "experiment_names": [
+    "Default",
+    "lab4-auto-mpg-gradient-boosting"
+  ]
+}

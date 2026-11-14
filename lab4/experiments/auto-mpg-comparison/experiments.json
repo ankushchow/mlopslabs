@@ -1,0 +1,111 @@
+{
+  "batch": "auto-mpg-comparison",
+  "created_at": "2026-11-14T22:06:14.083857+00:00",
+  "dataset": "UCI Auto MPG",
+  "data_quality": {
+    "dataset": "UCI Auto MPG",
+    "source_sha256": "48b830e11feee5572525f8f1691ddb9d38d3d7b7063edcd8fca672c2a5e17d8d",
+    "source_rows": 398,
+    "usable_rows": 392,
+    "dropped_rows": 6,
+    "dropped_row_ids": [
+      32,
+      126,
+      330,
+      336,
+      354,
+      374
+    ],
+    "features": [
+      "cylinders",
+      "displacement",
+      "horsepower",
+      "weight",
+      "acceleration",
+      "model_year"
+    ],
+    "target": "mpg",
+    "excluded_columns": [
+      "origin",
+      "car_name"
+    ]
+  },
+  "versions": {
+    "mlflow": "3.5.1",
+    "scikit-learn": "1.7.2",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3"
+  },
+  "split_sizes": {
+    "train": 234,
+    "validation": 79,
+    "test": 79
+  },
+  "settings": {
+    "n_estimators": 100,
+    "learning_rate": 0.05,
+    "random_state": 42
+  },
+  "selection_metric": "lowest validation RMSE; shallower model breaks ties",
+  "candidates": [
+    {
+      "name": "depth-1",
+      "description": "Compare depth 1; all other settings and data stay fixed.",
+      "max_depth": 1,
+      "run_id": "1fc84ef652f54b39b0178405c18a1ecc",
+      "model_uri": "models:/m-3cdedc6ebd664582a7dd0e49ab3da12b",
+      "validation": {
+        "rmse": 3.1028985142632033,
+        "mae": 2.1539869948335566,
+        "r2": 0.8178541726677045
+      }
+    },
+    {
+      "name": "depth-2",
+      "description": "Compare depth 2; all other settings and data stay fixed.",
+      "max_depth": 2,
+      "run_id": "777425cbcbbd4c89b127ed5ae02fffa7",
+      "model_uri": "models:/m-abc0a52e56a24566aaa3ce244bdc86a4",
+      "validation": {
+        "rmse": 2.9361131167605206,
+        "mae": 2.1213582704655383,
+        "r2": 0.8369091297173421
+      }
+    },
+    {
+      "name": "depth-3",
+      "description": "Compare depth 3; all other settings and data stay fixed.",
+      "max_depth": 3,
+      "run_id": "83b3cfe929fd477886824c432964b750",
+      "model_uri": "models:/m-0f67079dfdb74511ad9958770cf2258a",
+      "validation": {
+        "rmse": 2.874512377387311,
+        "mae": 2.07227590346157,
+        "r2": 0.8436807546275157
+      }
+    }
+  ],
+  "selected": {
+    "name": "depth-3",
+    "description": "Compare depth 3; all other settings and data stay fixed.",
+    "max_depth": 3,
+    "run_id": "83b3cfe929fd477886824c432964b750",
+    "model_uri": "models:/m-0f67079dfdb74511ad9958770cf2258a",
+    "validation": {
+      "rmse": 2.874512377387311,
+      "mae": 2.07227590346157,
+      "r2": 0.8436807546275157
+    }
+  },
+  "test": {
+    "rmse": 2.681844777338349,
+    "mae": 2.022316780263247,
+    "r2": 0.8590868098834847
+  },
+  "mean_baseline_test": {
+    "rmse": 7.218804289216491,
+    "mae": 5.905171481120848,
+    "r2": -0.02097452768347008
+  },
+  "reload_matches": true
+}
